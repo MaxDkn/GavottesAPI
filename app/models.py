@@ -26,7 +26,7 @@ class House(Base):
 
 #  User Model
 
-
+"""
 class UserStatus(Enum):
     ADMIN = "admin"
     UNAUTHORIZED = "unauthorized"
@@ -43,3 +43,14 @@ class User(Base):
     Password = Column(String)
     #  Status = Column(SQLEnum(UserStatus), nullable=False, default=UserStatus.UNAUTHORIZED)
     Access = Column(Boolean, default=False)
+"""
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String)
+    email = Column(String)
+    full_name = Column(String)
+    disabled = Column(Boolean)
+    hashed_password = Column(String)

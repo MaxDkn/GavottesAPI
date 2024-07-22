@@ -1,12 +1,12 @@
 from sqlalchemy.orm import Session
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 import app.models as models, app.schemas as schemas
 
 
 def get_house(db: Session, house_id: int):
     stored_house = db.query(models.House).filter(models.House.id == house_id).first()
     if not stored_house:
-        raise HTTPException(status_code=404, detail=f"House {house_id} does not exist.")    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"House with ID {house_id} not found")    
     return stored_house
     
 

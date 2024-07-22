@@ -62,7 +62,7 @@ class HouseResponse(House):
 
 #  User Templates
 
-
+"""
 class User(BaseModel):
     id: int
     FirstName: str
@@ -78,3 +78,15 @@ class UserFormCreate(BaseModel):
     LastName: str
     Email: str
     Password: str
+"""
+
+class User(BaseModel):
+    username: str
+    email: str | None = None
+    full_name: str | None = None
+    disabled: bool | None = None
+
+
+class UserInDB(User):
+    hashed_password: str
+
