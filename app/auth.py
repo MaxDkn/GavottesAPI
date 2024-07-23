@@ -18,8 +18,17 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 def get_user(db: Session, username: str):
-    stored_user = db.query(models.User).filter(models.User.username==username)
-    """if not stored_user:
+    stored_user = db.query(models.User).filter(models.User.username == username).first()
+    """
+    if not stored_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with "username" {username} not found')
     """
     return stored_user
+
+
+def create_user(db: Session, user: schemas.UserInDB):
+    db_user = models.User(**user.dict())
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user

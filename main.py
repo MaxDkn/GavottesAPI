@@ -22,13 +22,23 @@ def get_db():
         db.close()
 
 
-def decode(token, db: Session = Depends(get_db)):
+
+@app.get('/')
+def create_user(db: Session = Depends(get_db)):
+    pwd = auth.hash_password('password')
+    stored_user = auth.get_user(db, username='max')
+    if not stored_user:
+        return auth.create_user(db, schemas.UserInDB(username="max", hashed_password=pwd))
+    return f"user {'max'} already created!"
+
+
+def decode(token, db: Session):
     user = auth.get_user(db=db, username=token)
     return user
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
-    user = decode(token)
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
+    user = decode(token, db=db)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -49,8 +59,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: 
     user = auth.get_user(db, form_data.username)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
-    hashed_password = auth.hash_password(form_data.password)
-    if not hashed_password == user.hashed_password:
+    if not auth.verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
     return {"access_token": user.username, "token_type": "bearer"}
